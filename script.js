@@ -4,7 +4,7 @@ var fft
 var particles = []
 
 function preload() {
-  song = loadSound('everglow.mp3')
+  //song = loadSound('everglow.mp3')
   img = loadImage('bg.jpg')
 }
 
@@ -13,11 +13,20 @@ function setup() {
   angleMode(DEGREES)
   imageMode(CENTER)
   rectMode(CENTER)
+  fileInput = createFileInput(handleFile);
   fft = new p5.FFT(0.3)
 
   img.filter(BLUR, 12)
 
   noLoop()
+}
+function handleFile(file) {
+  if (file.type === 'audio') {
+    song = loadSound(file.data, mouseClicked);
+  }
+  else {
+    print('Invalid audio file!');
+  }
 }
 
 function draw() {
