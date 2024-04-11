@@ -2,6 +2,9 @@ var song
 var img
 var fft
 var particles = []
+let isPlaying = false;
+let sliderDragged = false;
+let slider; // Slider to scrub through the song
 
 function preload() {
   //song = loadSound('everglow.mp3')
@@ -9,22 +12,39 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  angleMode(DEGREES)
-  imageMode(CENTER)
-  rectMode(CENTER)
   fileInput = createFileInput(handleFile);
-  fft = new p5.FFT(0.3)
+  createCanvas(windowWidth, windowHeight);
 
-  img.filter(BLUR, 12)
+  angleMode(DEGREES);
+  imageMode(CENTER);
+  rectMode(CENTER);
+  fft = new p5.FFT(0.3);
+  img.filter(BLUR, 12);
 
-  noLoop()
+  slider = createSlider(0, 1, 0, 0.01);
+  slider.position(10, 10);
+  slider.style('width', '80%');
+  slider.input(() => {
+    sliderDragged = true; // Set to true when the slider is dragged
+    let songCurrentTime = map(slider.value(), 0, 1, 0, song.duration());
+    song.jump(songCurrentTime);
+  });
+  slider.input(scrubAudio);
+
+  noLoop();
+
+}
+function scrubAudio() {
+  let songCurrentTime = map(slider.value(), 0, 1, 0, song.duration());
+  song.jump(songCurrentTime);
 }
 function handleFile(file) {
   if (file.type === 'audio') {
-    song = loadSound(file.data, mouseClicked);
-  }
-  else {
+    song = loadSound(file.data, () => {
+      slider.max(song.duration()); // Set the slider's maximum value to the song's duration
+      mouseClicked(); // Start playing the song
+    });
+  } else {
     print('Invalid audio file!');
   }
 }
@@ -85,19 +105,26 @@ function draw() {
     }
     
   }
+
+  if (song.isPlaying() && !sliderDragged) {
+    let val = map(song.currentTime(), 0, song.duration(), 0, 1);
+    slider.value(val);
+  }
   
 }
 
 function mouseClicked() {
-  if (song.isPlaying()) {
-    song.pause()
-    noLoop()
-  } else {
-    song.play()
-    loop()
+  // Check if the mouse is not over the slider
+  if (!slider.elt.matches(':hover')) {
+    if (song.isPlaying()) {
+      song.pause();
+      // noLoop(); // Remove this to keep the draw loop running
+    } else {
+      song.play();
+      loop();
+    }
   }
 }
-
 class Particle {
   constructor() {
     this.pos = p5.Vector.random2D().mult(250)
