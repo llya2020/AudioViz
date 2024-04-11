@@ -3,7 +3,6 @@ var img
 var fft
 var particles = []
 let isPlaying = false;
-let sliderDragged = false;
 let slider; // Slider to scrub through the song
 
 function preload() {
@@ -20,24 +19,20 @@ function setup() {
   rectMode(CENTER);
   fft = new p5.FFT(0.3);
   img.filter(BLUR, 12);
-
+  //implements video scrubbing slider
   slider = createSlider(0, 1, 0, 0.01);
   slider.position(10, 10);
   slider.style('width', '80%');
+  //function to allow the video to jump to the point in time of the slider
   slider.input(() => {
-    sliderDragged = true; // Set to true when the slider is dragged
     let songCurrentTime = map(slider.value(), 0, 1, 0, song.duration());
     song.jump(songCurrentTime);
   });
-  slider.input(scrubAudio);
 
   noLoop();
 
 }
-function scrubAudio() {
-  let songCurrentTime = map(slider.value(), 0, 1, 0, song.duration());
-  song.jump(songCurrentTime);
-}
+
 function handleFile(file) {
   if (file.type === 'audio') {
     song = loadSound(file.data, () => {
@@ -105,9 +100,8 @@ function draw() {
     }
     
   }
-
-  if (song.isPlaying() && !sliderDragged) {
-    let val = map(song.currentTime(), 0, song.duration(), 0, 1);
+  let val = map(song.currentTime(), 0, song.duration(), 0, 1);
+  if (song.isPlaying()) {
     slider.value(val);
   }
   
@@ -121,6 +115,10 @@ function mouseClicked() {
       // noLoop(); // Remove this to keep the draw loop running
     } else {
       song.play();
+      //if we moved the slider from when it was paused, jump there
+      if (abs(slider.value() - map(song.currentTime(), 0, song.duration(), 0, 1)) > 0.01) {
+        song.jump(map(slider.value(), 0, 1, 0, song.duration()));
+      }
       loop();
     }
   }
