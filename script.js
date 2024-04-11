@@ -20,7 +20,7 @@ function setup() {
   fft = new p5.FFT(0.3);
   img.filter(BLUR, 12);
   //implements video scrubbing slider
-  slider = createSlider(0, 1, 0, 0.01);
+  slider = createSlider(0, 1, 0, 0.001);
   slider.position(10, 10);
   slider.style('width', '80%');
   //function to allow the video to jump to the point in time of the slider
