@@ -1,5 +1,6 @@
 var song
-var img
+var img // background image
+var imgLoaded
 var fft
 var particles = []
 let isPlaying = false;
@@ -7,11 +8,14 @@ let slider; // Slider to scrub through the song
 
 function preload() {
   //song = loadSound('everglow.mp3')
-  img = loadImage('bg.jpg')
+  img = loadImage('bg.jpg');
+  imgLoaded = true;
 }
 
 function setup() {
-  fileInput = createFileInput(handleFile);
+  fileInput = createFileInput(handleAudioFile);
+  backgroundFileInput = createFileInput(handleImgFile);
+
   createCanvas(windowWidth, windowHeight);
 
   angleMode(DEGREES);
@@ -33,7 +37,7 @@ function setup() {
 
 }
 
-function handleFile(file) {
+function handleAudioFile(file) {
   if (file.type === 'audio') {
     song = loadSound(file.data, () => {
       slider.max(song.duration()); // Set the slider's maximum value to the song's duration
@@ -42,6 +46,50 @@ function handleFile(file) {
   } else {
     print('Invalid audio file!');
   }
+} 
+
+function handleImgFile(file) {
+  imgLoaded = false;
+  if (file.type === 'image') {
+    img = loadImage(file.data);
+    imgCreated();
+    img.hide();
+    draw();
+  } else {
+    print('Invalid audio file!');
+  }
+}
+
+function imgCreated(){
+  img.hide();
+  // Create a temporary p5.Graphics object to draw the image.
+  let g = createGraphics(img.elt.width, img.elt.height);
+  g.image(img, 0, 0);
+  // Remove the original element from the DOM.
+  img.remove();
+  // g.get will return image data as a p5.Image object
+  img = g.get(0, 0, g.width, g.height)
+  
+  // Because we've converted it into a p5.Image object, we can
+  // use functions such as 'resize', and 'filter',
+  // which aren't available on the HTML img element.
+  // Uncomment the following lines for an example...
+  
+  /*
+  // Resize it to fill the canvas
+  if (img.width < img.height){
+    img.resize(width, 0);
+  } else {
+    img.resize(0, height);
+  }
+  
+  // Posterize and invert the colours
+  img.filter(POSTERIZE, 2);
+  img.filter(INVERT);
+  */
+
+  // Record that we have finished creating the image object.
+  imgLoaded = true;
 }
 
 function draw() {
@@ -58,8 +106,11 @@ function draw() {
     rotate(random(-0.5, 0.5))
   }
 
-  image(img, 0, 0, width + 100, height + 100)
-  pop()
+  if (imgLoaded) {
+    image(img, 0, 0, width + 100, height + 100);
+    pop();
+  }
+  
 
   var alpha = map(amp, 0, 255, 180, 150)
   fill(0, alpha)
