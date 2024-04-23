@@ -11,7 +11,7 @@ let sload = false; // Check if file is loaded
 function preload() {
   //song = loadSound('everglow.mp3')
   img = loadImage('bg.jpg')
-  button = loadImage('button.jpg')
+  button = loadImage('button.png')
 }
 
 function setup() {
@@ -26,9 +26,9 @@ function setup() {
   img.filter(BLUR, 12);
   //implements video scrubbing slider
   pb = createSlider(0, 1, 0, 0.001);
-  pb.position(0, pb.size().width+pb.size().height);
+  pb.position(0, windowHeight-fileInput.height);
   pb.style('width', '80%');
-  c = createCanvas(pb.size().width, pb.size().width);
+  c = createCanvas(pb.size().width, pb.y-5);
   //function to allow the video to jump to the point in time of the slider
   pb.input(() => {
     let songCurrentTime = map(pb.value(), 0, 1, 0, song.duration());
@@ -41,10 +41,26 @@ function setup() {
 
 function handleFile(file) {
   if (file.type === 'audio') {
+    noLoop();
+    // Stop current song if one is playing
+    if (song && isPlaying) {
+      song.stop();
+    }
+
+    // Clear existing particles
+    particles = [];
     //console.log('Attempting to load audio file:', file.data);
+
+    // Reset the visualizer and other elements
+    fft = new p5.FFT(0.3); // Optionally reset FFT
+    c.cl
+    
     song = loadSound(file.data, () => {
-      image(button, 0, 0, 200, 100);
       sload = true;
+      pb.value(0);
+      isPlaying = true;
+      song.play();
+      loop();
     });
   } else {
     print('Invalid audio file!');
@@ -84,7 +100,7 @@ function draw() {
     for (var i = 0; i <= 180; i += 0.5) {
       var index = floor(map(i, 0, 180, 0, wave.length - 1))
 
-      var r = map(wave[index], -1, 1, 100, 100)
+      var r = map(wave[index], -1, 1, 150, 350) 
       
       var x = r * sin(i) * t
       var y = r * cos(i)
@@ -117,8 +133,8 @@ function draw() {
 }
 
 function mouseClicked() {
-  // Check if the mouse is not over the slider
-  if (!pb.elt.matches(':hover')) {
+  // Check if the mouse is in canvas
+  if (0 <= mouseX && mouseX <= c.size().width && 0 <= mouseY && mouseY <= c.size().height) {
     if (isPlaying) {
       isPlaying = false;
       song.pause();
@@ -134,9 +150,10 @@ function mouseClicked() {
     }
   }
 }
+
 class Particle {
   constructor() {
-    this.pos = p5.Vector.random2D().mult(100)
+    this.pos = p5.Vector.random2D().mult(250)
     this.vel = createVector(0, 0)
     this.acc = this.pos.copy().mult(random(0.0001, 0.00001))
 
@@ -144,6 +161,7 @@ class Particle {
 
     this.color = [random(200, 255), random(200, 255), random(200, 255),]
   }
+
   update(cond) {
     this.vel.add(this.acc)
     this.pos.add(this.vel)
@@ -153,6 +171,7 @@ class Particle {
       this.pos.add(this.vel)
     }
   }
+
   edges() {
     if (this.pos.x < -width / 2 || this.pos.x > width / 2 || this.pos.y < -height / 2 || this.pos.y > height / 2) {
       return true
@@ -160,6 +179,7 @@ class Particle {
       return false
     }
   }
+
   show() {
     noStroke()
     fill(this.color)
