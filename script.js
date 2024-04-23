@@ -44,6 +44,13 @@ function setup() {
   strokeSlider.position(10, 40);
   strokeSlider.style('width', '20%');
 
+  shapeSelect = createSelect();
+  shapeSelect.position(10, 140);
+
+  // Add color options.
+  shapeSelect.option('circle');
+  shapeSelect.option('line');
+  shapeSelect.selected('line');
 
   noLoop();
 
@@ -106,7 +113,6 @@ function imgCreated(){
 
 function draw() {
   background(255)
-  
 
   translate(width / 2, height / 2)
 
@@ -129,40 +135,48 @@ function draw() {
   noStroke();
   rect(0, 0, width, height);
 
-  var sliderValue = strokeSlider.value();
   stroke(strokeColor.color());
-  strokeWeight(sliderValue);
+  strokeWeight(strokeSlider.value());
   noFill();
 
   var wave = fft.waveform()
-
-  for (var t = -1; t <= 1; t += 2) {
-    beginShape()
-    for (var i = 0; i <= 180; i += 0.5) {
-      var index = floor(map(i, 0, 180, 0, wave.length - 1))
-  
-      var r = map(wave[index], -1, 1, 150, 350)
+  if (shapeSelect.selected() == 'circle') {
+    for (var t = -1; t <= 1; t += 2) {
+      beginShape()
+        for (var i = 0; i <= 180; i += 0.5) {
+          var index = floor(map(i, 0, 180, 0, wave.length - 1))
       
-      var x = r * sin(i) * t
-      var y = r * cos(i)
+          var r = map(wave[index], -1, 1, 150, 350)
+          
+          var x = r * sin(i) * t
+          var y = r * cos(i)
+          vertex(x, y)
+        }
+      endShape()
+    }
+    var p = new Particle()
+    particles.push(p)
+    for (var i = particles.length - 1; i >= 0; i--) {
+      if (!particles[i].edges()) {
+        particles[i].update(amp > 230)
+        particles[i].show()
+      } else {
+        particles.splice(i, 1)
+      }
+      
+    }
+  } else {
+    beginShape()
+    for (var i = 0; i < width*2; i++) {
+      var index = floor(map(i, 0, width*2, 0, wave.length))
+      
+      var x = i - width
+      var y = wave[index] * 100 
       vertex(x, y)
     }
     endShape()
   }
   
-  var p = new Particle()
-  particles.push(p)
-
-
-  for (var i = particles.length - 1; i >= 0; i--) {
-    if (!particles[i].edges()) {
-      particles[i].update(amp > 230)
-      particles[i].show()
-    } else {
-      particles.splice(i, 1)
-    }
-    
-  }
   let val = map(song.currentTime(), 0, song.duration(), 0, 1);
   if (song.isPlaying()) {
     slider.value(val);
