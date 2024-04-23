@@ -23,6 +23,7 @@ function setup() {
   rectMode(CENTER);
   fft = new p5.FFT(0.3);
   img.filter(BLUR, 12);
+
   //implements video scrubbing slider
   slider = createSlider(0, 1, 0, 0.001);
   slider.position(10, 10);
@@ -32,6 +33,17 @@ function setup() {
     let songCurrentTime = map(slider.value(), 0, 1, 0, song.duration());
     song.jump(songCurrentTime);
   });
+
+  particleColor = createColorPicker('deeppink');
+  particleColor.position(10, 80);  
+  
+  strokeColor = createColorPicker('deeppink');
+  strokeColor.position(10, 115);
+
+  strokeSlider = createSlider(0,20,3);
+  strokeSlider.position(10, 40);
+  strokeSlider.style('width', '20%');
+
 
   noLoop();
 
@@ -93,7 +105,7 @@ function imgCreated(){
 }
 
 function draw() {
-  background(0)
+  background(255)
   
 
   translate(width / 2, height / 2)
@@ -112,15 +124,15 @@ function draw() {
   }
   
 
-  var alpha = map(amp, 0, 255, 180, 150)
-  fill(0, alpha)
-  noStroke()
-  rect(0, 0, width, height)
+  var alpha = map(amp, 0, 255, 180, 150);
+  fill(0, alpha);
+  noStroke();
+  rect(0, 0, width, height);
 
-  
-  stroke(255)
-  strokeWeight(3)
-  noFill()
+  var sliderValue = strokeSlider.value();
+  stroke(strokeColor.color());
+  strokeWeight(sliderValue);
+  noFill();
 
   var wave = fft.waveform()
 
@@ -182,7 +194,8 @@ class Particle {
 
     this.w = random(3, 5)
 
-    this.color = [random(200, 255), random(200, 255), random(200, 255),]
+    // this.color = [random(20, 255), random(200, 255), random(200, 255),]
+    this.color = particleColor.color();
   }
   update(cond) {
     this.vel.add(this.acc)
