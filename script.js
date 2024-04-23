@@ -34,7 +34,7 @@ function setup() {
     song.jump(songCurrentTime);
   });
 
-  particleColor = createColorPicker('deeppink');
+  particleColor = createColorPicker('lightgreen');
   particleColor.position(10, 80);  
   
   strokeColor = createColorPicker('deeppink');
@@ -48,9 +48,10 @@ function setup() {
   shapeSelect.position(10, 140);
 
   // Add color options.
-  shapeSelect.option('circle');
-  shapeSelect.option('line');
-  shapeSelect.selected('line');
+  shapeSelect.option('Circle');
+  shapeSelect.option('Line');
+  shapeSelect.option('Diamond');
+  shapeSelect.selected('Circle');
 
   noLoop();
 
@@ -71,11 +72,11 @@ function handleImgFile(file) {
   imgLoaded = false;
   if (file.type === 'image') {
     img = loadImage(file.data);
-    imgCreated();
+    imgLoaded = true;
     img.hide();
     draw();
   } else {
-    print('Invalid audio file!');
+    print('Invalid image file!');
   }
 }
 
@@ -140,7 +141,7 @@ function draw() {
   noFill();
 
   var wave = fft.waveform()
-  if (shapeSelect.selected() == 'circle') {
+  if (shapeSelect.selected() == 'Circle') {
     for (var t = -1; t <= 1; t += 2) {
       beginShape()
         for (var i = 0; i <= 180; i += 0.5) {
@@ -148,8 +149,8 @@ function draw() {
       
           var r = map(wave[index], -1, 1, 150, 350)
           
-          var x = r * sin(i) * t
-          var y = r * cos(i)
+          var x = r * sin(i) * t 
+          var y = r * cos(i) 
           vertex(x, y)
         }
       endShape()
@@ -165,12 +166,26 @@ function draw() {
       }
       
     }
-  } else {
+  } else if (shapeSelect.selected() == 'Diamond') {
+      for (var t = -4; t <= 4; t += 1) {
+        beginShape()
+          for (var i = 0; i <= 180; i += 90) {
+            var index = floor(map(i, 0, 180, 0, wave.length - 1))
+        
+            var r = map(wave[index], -1, 1, 150, 350)
+            
+            var x = r * sin(i) * t / 5
+            var y = r * cos(i) 
+            vertex(x, y)
+          }
+        endShape()
+      }
+  } else { // this is line
     beginShape()
-    for (var i = 0; i < width*2; i++) {
-      var index = floor(map(i, 0, width*2, 0, wave.length))
+    for (var i = 0; i < width*1; i++) {
+      var index = floor(map(i, 0, width*1, 0, wave.length))
       
-      var x = i - width
+      var x = i - width/2
       var y = wave[index] * 100 
       vertex(x, y)
     }
