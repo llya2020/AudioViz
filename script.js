@@ -13,6 +13,19 @@ function preload() {
   img = loadImage('gradient.jpg');
   imgLoaded = true;
 }
+function record(){
+  if (!isRecording){
+    recorder.start();
+    btn.html('stop recording');
+    isRecording = true;
+  }
+  else if (isRecording){
+    recorder.stop();
+    btn.html('start recording');
+    isRecording = false;
+  }
+  
+}
 
 function record(){
   play();
@@ -34,7 +47,9 @@ function setup() {
   fileInput = createFileInput(handleAudioFile);
   fileInput.position(5, 5);
   backgroundFileInput = createFileInput(handleImgFile);
-
+  recorder = new Recorder(this);
+  btn = createButton('start recording');
+  btn.mousePressed(record);
   createCanvas(windowWidth, windowHeight);
 
   angleMode(DEGREES);
