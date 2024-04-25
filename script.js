@@ -63,7 +63,7 @@ function setup() {
   sliderLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
   sliderLabel.style('padding', '5px');
 
-  strokeSlider = createSlider(1,25,3);
+  strokeSlider = createSlider(1,25,1);
   strokeSlider.position(10, slider.y+slider.height+55);
   strokeSlider.style('width', '20%');
   strokeSlider.attribute('disabled', '');  

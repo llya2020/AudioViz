@@ -11,14 +11,14 @@ class Recorder {
       // Settings
       this.settings = settings;
       this.audioOnly = settings.audioOnly || false;
-      this.fps = settings.fps || 60;
+      this.fps = settings.fps || 30;
       this.filename =
         settings.filename || settings.audioOnly ? "sketch.ogg" : "sketch.webm";
       this.codec =
         settings.codec || settings.audioOnly
           ? "audio/ogg; codecs=opus"
           : "video/webm; codecs=vp8,opus";
-      this.videoBitsPerSecond = settings.videoBitsPerSecond || 2500000;
+      this.videoBitsPerSecond = settings.videoBitsPerSecond || 8000000;
   
       // Are we recording or not
       this.recording = false;
