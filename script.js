@@ -240,17 +240,18 @@ function draw() {
         }
       endShape()
     }
-    var p = new Particle()
-    particles.push(p)
-    for (var i = particles.length - 1; i >= 0; i--) {
-      if (!particles[i].edges()) {
-        particles[i].update(amp > 230)
-        particles[i].show()
-      } else {
-        particles.splice(i, 1)
-      }
+    manageParticles('Circle');
+    // var p = new Particle()
+    // particles.push(p)
+    // for (var i = particles.length - 1; i >= 0; i--) {
+    //   if (!particles[i].edges()) {
+    //     particles[i].update(amp > 230)
+    //     particles[i].show()
+    //   } else {
+    //     particles.splice(i, 1)
+    //   }
       
-    }
+    // }
   } else if (shapeSelect.selected() == 'Diamond') {
       for (var t = -4; t <= 4; t += 1) {
         beginShape()
@@ -264,6 +265,8 @@ function draw() {
             vertex(x, y)
           }
         endShape()
+
+        // manageParticles('Diamond');
       }
   } else { // this is line
     beginShape()
@@ -275,6 +278,8 @@ function draw() {
       vertex(x, y)
     }
     endShape()
+
+    manageParticles('Line');
   }
 
   if (!isPlaying && sload) {
@@ -305,7 +310,7 @@ function play() {
 function mouseClicked() {
   // Check if the mouse is not over the slider
 
-  if (!slider.elt.matches(':hover')&&!checkbox.elt.matches(':hover')&&!strokeColor.elt.matches(':hover')&&!strokeSlider.elt.matches(':hover')&&!particleColor.elt.matches(':hover')&&!shapeSelect.elt.matches(':hover')&&(mouseY<=windowHeight)) {
+  if (!slider.elt.matches(':hover')&&!checkbox.elt.matches(':hover')&&!strokeColor.elt.matches(':hover')&&!strokeSlider.elt.matches(':hover')&&!particleColor.elt.matches(':hover')&&!minPartSlider.elt.matches(':hover')&&!maxPartSlider.elt.matches(':hover')&&!shapeSelect.elt.matches(':hover')&&(mouseY<=windowHeight)) {
     if (isPlaying) {
       isPlaying = false;
       song.pause();
@@ -322,35 +327,89 @@ function mouseClicked() {
   }
 }
 class Particle {
-  constructor() {
-    this.pos = p5.Vector.random2D().mult(250)
-    this.vel = createVector(0, 0)
-    this.acc = this.pos.copy().mult(random(0.0001, 0.00001))
-
+  constructor(shape) {
+    if (shape === 'Circle') {
+      this.pos = p5.Vector.random2D().mult(250);
+    } else if (shape === 'Diamond' || shape === 'Line') {
+      // For non-circular shapes, start particles from a specific point or distribute differently
+      this.pos = createVector(random(-width / 2, width / 2), random(-height / 2, height / 2));
+    }
+    this.vel = createVector(0, 0);
+    this.acc = this.pos.copy().mult(random(0.0001, 0.00001));
     this.w = random(minPartSlider.value(), maxPartSlider.value())
-
-    // this.color = [random(20, 255), random(200, 255), random(200, 255),]
-    this.color = particleColor.color();
+    this.color = particleColor.color(); // Ensure you have a default if particleColor is undefined
   }
   update(cond) {
-    this.vel.add(this.acc)
-    this.pos.add(this.vel)
+    this.vel.add(this.acc);
+    this.pos.add(this.vel);
     if (cond) {
-      this.pos.add(this.vel)
-      this.pos.add(this.vel)
-      this.pos.add(this.vel)
+      this.pos.add(this.vel).add(this.vel).add(this.vel);
     }
   }
   edges() {
-    if (this.pos.x < -width / 2 || this.pos.x > width / 2 || this.pos.y < -height / 2 || this.pos.y > height / 2) {
-      return true
-    } else {
-      return false
-    }
+    return (this.pos.x < -width / 2 || this.pos.x > width / 2 || this.pos.y < -height / 2 || this.pos.y > height / 2);
   }
   show() {
-    noStroke()
-    fill(this.color)
-    ellipse(this.pos.x, this.pos.y, this.w)
+    noStroke();
+    fill(this.color);
+    ellipse(this.pos.x, this.pos.y, this.w);
   }
 }
+
+
+function manageParticles(shape) {
+
+  var p = new Particle(shape); // Pass the current shape to the constructor
+
+  particles.push(p);
+
+  for (var i = particles.length - 1; i >= 0; i--) {
+
+    if (!particles[i].edges()) {
+
+      particles[i].update(amp > 230); // Consider updating this condition or making it shape-dependent
+
+      particles[i].show();
+
+    } else {
+
+      particles.splice(i, 1);
+
+    }
+
+  }
+
+}
+// class Particle {
+//   constructor() {
+//     this.pos = p5.Vector.random2D().mult(250)
+//     this.vel = createVector(0, 0)
+//     this.acc = this.pos.copy().mult(random(0.0001, 0.00001))
+
+//     this.w = random(minPartSlider.value(), maxPartSlider.value())
+
+//     // this.color = [random(20, 255), random(200, 255), random(200, 255),]
+//     this.color = particleColor.color();
+//   }
+//   update(cond) {
+//     this.vel.add(this.acc)
+//     this.pos.add(this.vel)
+//     if (cond) {
+//       this.pos.add(this.vel)
+//       this.pos.add(this.vel)
+//       this.pos.add(this.vel)
+//     }
+//   }
+//   edges() {
+//     if (this.pos.x < -width / 2 || this.pos.x > width / 2 || this.pos.y < -height / 2 || this.pos.y > height / 2) {
+//       return true
+//     } else {
+//       return false
+//     }
+//   }
+//   show() {
+//     noStroke()
+//     fill(this.color)
+//     ellipse(this.pos.x, this.pos.y, this.w)
+//   }
+// }
