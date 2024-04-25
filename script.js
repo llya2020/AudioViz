@@ -3,17 +3,36 @@ var img // background image
 var imgLoaded
 var fft
 var particles = []
+
 let isPlaying = false;
 let slider; // Slider to scrub through the song
+let recorder; //from recorder.js, mediaARecorder wrapper
+let isRecording = false;
 
 function preload() {
-  //song = loadSound('everglow.mp3')
-  img = loadImage('bg.jpg');
+  img = loadImage('gradient.jpg');
   imgLoaded = true;
 }
 
+function record(){
+  play();
+  if (!isRecording){
+    recorder.start();
+    btn.html('stop recording');
+    isRecording = true;
+  }
+  else if (isRecording){
+    recorder.stop();
+    btn.html('start recording');
+    isRecording = false;
+  }
+}
+
 function setup() {
+  alert("Please upload an audio file using the Choose File button in the top left corner")
+  idata = img.canvas.toDataURL();
   fileInput = createFileInput(handleAudioFile);
+  fileInput.position(5, 5);
   backgroundFileInput = createFileInput(handleImgFile);
 
   createCanvas(windowWidth, windowHeight);
@@ -22,36 +41,107 @@ function setup() {
   imageMode(CENTER);
   rectMode(CENTER);
   fft = new p5.FFT(0.3);
-  img.filter(BLUR, 12);
+
+  recorder = new Recorder(this);
+  btn = createButton('Start Recording');
+  btn.mousePressed(record);
+  btn.attribute('disabled', ''); 
 
   //implements video scrubbing slider
   slider = createSlider(0, 1, 0, 0.001);
-  slider.position(10, 10);
+  slider.position(10, fileInput.y + 40);
   slider.style('width', '80%');
   //function to allow the video to jump to the point in time of the slider
   slider.input(() => {
     let songCurrentTime = map(slider.value(), 0, 1, 0, song.duration());
     song.jump(songCurrentTime);
   });
+  slider.attribute('disabled', '');
+  //slider.changed(play);
+  let sliderLabel = createP('Playback Control');
+  sliderLabel.position(15, slider.y + 5);
+  sliderLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  sliderLabel.style('padding', '5px');
 
-  particleColor = createColorPicker('lightgreen');
-  particleColor.position(10, 80);  
-  
-  strokeColor = createColorPicker('deeppink');
-  strokeColor.position(10, 115);
-
-  strokeSlider = createSlider(0,20,3);
-  strokeSlider.position(10, 40);
+  strokeSlider = createSlider(1,25,3);
+  strokeSlider.position(10, slider.y+slider.height+55);
   strokeSlider.style('width', '20%');
+  strokeSlider.attribute('disabled', '');  
+  strokeSlider.changed(play);
+  let strokeLabel = createP('Stroke Weight:');
+  strokeLabel.position(15, strokeSlider.y + strokeSlider.height - 10);
+  strokeLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  strokeLabel.style('padding', '5px');
+  
+  let strokeColorLabel = createP('Stroke Color');
+  strokeColorLabel.position(15, strokeSlider.y + strokeSlider.height + 30);
+  strokeColorLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  strokeColorLabel.style('padding', '5px');
+  strokeColor = createColorPicker('deeppink');
+  strokeColor.position(strokeColorLabel.x + 100, strokeColorLabel.y + 16);
+  strokeColor.attribute('disabled', '');  
+  strokeColor.changed(play);
 
+  minPartSlider = createSlider(0,40,6);
+  minPartSlider.position(10, strokeColorLabel.y + 55);
+  minPartSlider.style('width', '20%');
+  minPartSlider.attribute('disabled', '');  
+  minPartSlider.changed(play);
+  let minPartSliderLab = createP('Min Particle Size:');
+  minPartSliderLab.position(15, minPartSlider.y + 5);
+  minPartSliderLab.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  minPartSliderLab.style('padding', '5px');
+
+  maxPartSlider = createSlider(0,40,3);
+  maxPartSlider.position(10, minPartSliderLab.y+50);
+  maxPartSlider.style('width', '20%');
+  maxPartSlider.attribute('disabled', '');  
+  maxPartSlider.changed(play);
+  let maxPartSliderLab = createP('Max Particle Size:');
+  maxPartSliderLab.position(15, maxPartSlider.y + 5);
+  maxPartSliderLab.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  maxPartSliderLab.style('padding', '5px');
+
+  let particleColorLabel = createP('Particle Color:');
+  particleColorLabel.position(15, maxPartSliderLab.y + maxPartSliderLab.height + 25);
+  particleColorLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  particleColorLabel.style('padding', '5px');
+  particleColor = createColorPicker('lightgreen');
+  particleColor.position(particleColorLabel.x + 110, particleColorLabel.y + 16);
+  particleColor.attribute('disabled', '');  
+  particleColor.changed(play)
+
+  let shapeSelectLabel = createP('Shape Select');
+  shapeSelectLabel.position(15, particleColor.y + 20);
+  shapeSelectLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  shapeSelectLabel.style('padding', '5px');
   shapeSelect = createSelect();
-  shapeSelect.position(10, 140);
-
+  shapeSelect.position(100 + shapeSelectLabel.x,shapeSelectLabel.y+20);
+  shapeSelect.attribute('disabled', '');  
+  shapeSelect.changed(play);
   // Add color options.
   shapeSelect.option('Circle');
   shapeSelect.option('Line');
   shapeSelect.option('Diamond');
   shapeSelect.selected('Circle');
+
+  let backgroundLabel = createP('Background Image');
+  backgroundLabel.position(15, shapeSelectLabel.y + 40);
+  backgroundLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  backgroundLabel.style('padding', '5px');
+  backgroundFileInput.position(backgroundLabel.x + 140, backgroundLabel.y+20)
+  backgroundFileInput.attribute('disabled', '');
+
+  let checkboxLabel = createP('Enable Blur');
+  checkboxLabel.position(15, backgroundLabel.y + 40);
+  checkboxLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  checkboxLabel.style('padding', '5px');
+  checkbox = createCheckbox('', false); 
+  checkbox.position(checkboxLabel.x + 90, checkboxLabel.y+20);
+  checkbox.changed(checked);
+  checkbox.attribute('disabled', '');  
+
+
 
   noLoop();
 
@@ -60,8 +150,21 @@ function setup() {
 function handleAudioFile(file) {
   if (file.type === 'audio') {
     song = loadSound(file.data, () => {
-      slider.max(song.duration()); // Set the slider's maximum value to the song's duration
-      mouseClicked(); // Start playing the song
+      sload = true;
+      backgroundFileInput.removeAttribute('disabled');
+      slider.removeAttribute('disabled');
+      particleColor.removeAttribute('disabled');
+      strokeColor.removeAttribute('disabled');
+      strokeSlider.removeAttribute('disabled');
+      shapeSelect.removeAttribute('disabled');
+      minPartSlider.removeAttribute('disabled');
+      maxPartSlider.removeAttribute('disabled');
+      checkbox.removeAttribute('disabled');
+      btn.removeAttribute('disabled');
+      slider.value(0);
+      isPlaying = true;
+      song.play();
+      loop();
     });
   } else {
     print('Invalid audio file!');
@@ -69,47 +172,31 @@ function handleAudioFile(file) {
 } 
 
 function handleImgFile(file) {
-  imgLoaded = false;
   if (file.type === 'image') {
-    img = loadImage(file.data);
-    imgLoaded = true;
-    img.hide();
-    draw();
+    play();
+    idata = file.data; // Assuming this is the source URL or path.
+    loadImage(idata, function(loadedImage) {
+      img = loadedImage;
+      if (checkbox.checked()) {
+        console.log("Image loaded and blur applied:", checkbox.checked());
+        img.filter(BLUR, 12); // Apply blur if checkbox is checked
+      }
+    });
   } else {
     print('Invalid image file!');
   }
 }
 
-function imgCreated(){
-  img.hide();
-  // Create a temporary p5.Graphics object to draw the image.
-  let g = createGraphics(img.elt.width, img.elt.height);
-  g.image(img, 0, 0);
-  // Remove the original element from the DOM.
-  img.remove();
-  // g.get will return image data as a p5.Image object
-  img = g.get(0, 0, g.width, g.height)
-  
-  // Because we've converted it into a p5.Image object, we can
-  // use functions such as 'resize', and 'filter',
-  // which aren't available on the HTML img element.
-  // Uncomment the following lines for an example...
-  
-  /*
-  // Resize it to fill the canvas
-  if (img.width < img.height){
-    img.resize(width, 0);
+function checked() {
+  play();
+  if (checkbox.checked()) {
+    img.filter(BLUR, 12); // Apply blur if checkbox is checked
   } else {
-    img.resize(0, height);
+    // Reload the image from the original data to remove blur
+    loadImage(idata, function(loadedImage) {
+      img = loadedImage; // Update the global image object
+    });
   }
-  
-  // Posterize and invert the colours
-  img.filter(POSTERIZE, 2);
-  img.filter(INVERT);
-  */
-
-  // Record that we have finished creating the image object.
-  imgLoaded = true;
 }
 
 function draw() {
@@ -125,10 +212,8 @@ function draw() {
     rotate(random(-0.5, 0.5))
   }
 
-  if (imgLoaded) {
-    image(img, 0, 0, width + 100, height + 100);
-    pop();
-  }
+  image(img, 0, 0, width + 100, height + 100);
+  pop();
   
 
   var alpha = map(amp, 0, 255, 180, 150);
@@ -191,21 +276,42 @@ function draw() {
     }
     endShape()
   }
+
+  if (!isPlaying && sload) {
+    // Draw button
+    fill(150);
+    noStroke();
+    triangle(-50, -75, -50, 75, 75, 0);
+    } else {
+      let val = map(song.currentTime(), 0, song.duration(), 0, 1);
+      slider.value(val);
+    }
   
-  let val = map(song.currentTime(), 0, song.duration(), 0, 1);
-  if (song.isPlaying()) {
-    slider.value(val);
+  // let val = map(song.currentTime(), 0, song.duration(), 0, 1);
+  // if (song.isPlaying()) {
+  //   slider.value(val);
+  // }
+  
+}
+
+function play() {
+  if(!isPlaying) {
+    isPlaying = true;
+    song.play();
+    loop();
   }
-  
 }
 
 function mouseClicked() {
   // Check if the mouse is not over the slider
-  if (!slider.elt.matches(':hover')) {
-    if (song.isPlaying()) {
+
+  if (!slider.elt.matches(':hover')&&!checkbox.elt.matches(':hover')&&!strokeColor.elt.matches(':hover')&&!strokeSlider.elt.matches(':hover')&&!particleColor.elt.matches(':hover')&&!shapeSelect.elt.matches(':hover')&&(mouseY<=windowHeight)) {
+    if (isPlaying) {
+      isPlaying = false;
       song.pause();
-      // noLoop(); // Remove this to keep the draw loop running
+      noLoop(); // Remove this to keep the draw loop running
     } else {
+      isPlaying = true;
       song.play();
       //if we moved the slider from when it was paused, jump there
       if (abs(slider.value() - map(song.currentTime(), 0, song.duration(), 0, 1)) > 0.01) {
@@ -221,7 +327,7 @@ class Particle {
     this.vel = createVector(0, 0)
     this.acc = this.pos.copy().mult(random(0.0001, 0.00001))
 
-    this.w = random(3, 5)
+    this.w = random(minPartSlider.value(), maxPartSlider.value())
 
     // this.color = [random(20, 255), random(200, 255), random(200, 255),]
     this.color = particleColor.color();
