@@ -5,17 +5,34 @@ var fft
 var particles = []
 let isPlaying = false;
 let slider; // Slider to scrub through the song
+let recorder; //from recorder.js, mediaARecorder wrapper
+let isRecording = false;
 
 function preload() {
   //song = loadSound('everglow.mp3')
   img = loadImage('bg.jpg');
   imgLoaded = true;
 }
+function record(){
+  if (!isRecording){
+    recorder.start();
+    btn.html('stop recording');
+    isRecording = true;
+  }
+  else if (isRecording){
+    recorder.stop();
+    btn.html('start recording');
+    isRecording = false;
+  }
+  
+}
 
 function setup() {
   fileInput = createFileInput(handleAudioFile);
   backgroundFileInput = createFileInput(handleImgFile);
-
+  recorder = new Recorder(this);
+  btn = createButton('start recording');
+  btn.mousePressed(record);
   createCanvas(windowWidth, windowHeight);
 
   angleMode(DEGREES);
