@@ -29,7 +29,11 @@ function record(){
 }
 
 function setup() {
-  alert("Please upload an audio file using the Choose File button in the top left corner")
+  if (song != null) {
+    createCanvas(400,400)
+    background(100)
+  } else {
+    // alert("Please upload an audio file using the Choose File button in the top left corner")
   idata = img.canvas.toDataURL();
   fileInput = createFileInput(handleAudioFile);
   fileInput.position(5, 5);
@@ -139,8 +143,118 @@ function setup() {
   checkbox.position(checkboxLabel.x + 90, checkboxLabel.y+20);
   checkbox.changed(checked);
   checkbox.attribute('disabled', '');  
+  }
 
+  // // alert("Please upload an audio file using the Choose File button in the top left corner")
+  // idata = img.canvas.toDataURL();
+  // fileInput = createFileInput(handleAudioFile);
+  // fileInput.position(5, 5);
+  // backgroundFileInput = createFileInput(handleImgFile);
+  // createCanvas(windowWidth, windowHeight);
 
+  // angleMode(DEGREES);
+  // imageMode(CENTER);
+  // rectMode(CENTER);
+  // fft = new p5.FFT(0.3);
+
+  // recorder = new Recorder(this);
+  // btn = createButton('Start Recording');
+  // btn.mousePressed(record);
+  // btn.attribute('disabled', ''); 
+
+  // //implements video scrubbing slider
+  // slider = createSlider(0, 1, 0, 0.001);
+  // slider.position(10, fileInput.y + 40);
+  // slider.style('width', '80%');
+  // //function to allow the video to jump to the point in time of the slider
+  // slider.input(() => {
+  //   let songCurrentTime = map(slider.value(), 0, 1, 0, song.duration());
+  //   song.jump(songCurrentTime);
+  // });
+  // slider.attribute('disabled', '');
+  // //slider.changed(play);
+  // let sliderLabel = createP('Playback Control');
+  // sliderLabel.position(15, slider.y + 5);
+  // sliderLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  // sliderLabel.style('padding', '5px');
+
+  // strokeSlider = createSlider(1,25,1);
+  // strokeSlider.position(10, slider.y+slider.height+55);
+  // strokeSlider.style('width', '20%');
+  // strokeSlider.attribute('disabled', '');  
+  // strokeSlider.changed(play);
+  // let strokeLabel = createP('Stroke Weight:');
+  // strokeLabel.position(15, strokeSlider.y + strokeSlider.height - 10);
+  // strokeLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  // strokeLabel.style('padding', '5px');
+  
+  // let strokeColorLabel = createP('Stroke Color');
+  // strokeColorLabel.position(15, strokeSlider.y + strokeSlider.height + 30);
+  // strokeColorLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  // strokeColorLabel.style('padding', '5px');
+  // strokeColor = createColorPicker('deeppink');
+  // strokeColor.position(strokeColorLabel.x + 100, strokeColorLabel.y + 16);
+  // strokeColor.attribute('disabled', '');  
+  // strokeColor.changed(play);
+
+  // minPartSlider = createSlider(0,40,6);
+  // minPartSlider.position(10, strokeColorLabel.y + 55);
+  // minPartSlider.style('width', '20%');
+  // minPartSlider.attribute('disabled', '');  
+  // minPartSlider.changed(play);
+  // let minPartSliderLab = createP('Min Particle Size:');
+  // minPartSliderLab.position(15, minPartSlider.y + 5);
+  // minPartSliderLab.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  // minPartSliderLab.style('padding', '5px');
+
+  // maxPartSlider = createSlider(0,40,3);
+  // maxPartSlider.position(10, minPartSliderLab.y+50);
+  // maxPartSlider.style('width', '20%');
+  // maxPartSlider.attribute('disabled', '');  
+  // maxPartSlider.changed(play);
+  // let maxPartSliderLab = createP('Max Particle Size:');
+  // maxPartSliderLab.position(15, maxPartSlider.y + 5);
+  // maxPartSliderLab.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  // maxPartSliderLab.style('padding', '5px');
+
+  // let particleColorLabel = createP('Particle Color:');
+  // particleColorLabel.position(15, maxPartSliderLab.y + maxPartSliderLab.height + 25);
+  // particleColorLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  // particleColorLabel.style('padding', '5px');
+  // particleColor = createColorPicker('lightgreen');
+  // particleColor.position(particleColorLabel.x + 110, particleColorLabel.y + 16);
+  // particleColor.attribute('disabled', '');  
+  // particleColor.changed(play)
+
+  // let shapeSelectLabel = createP('Shape Select');
+  // shapeSelectLabel.position(15, particleColor.y + 20);
+  // shapeSelectLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  // shapeSelectLabel.style('padding', '5px');
+  // shapeSelect = createSelect();
+  // shapeSelect.position(100 + shapeSelectLabel.x,shapeSelectLabel.y+20);
+  // shapeSelect.attribute('disabled', '');  
+  // shapeSelect.changed(play);
+  // // Add color options.
+  // shapeSelect.option('Circle');
+  // shapeSelect.option('Line');
+  // shapeSelect.option('Diamond');
+  // shapeSelect.selected('Circle');
+
+  // let backgroundLabel = createP('Background Image');
+  // backgroundLabel.position(15, shapeSelectLabel.y + 40);
+  // backgroundLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  // backgroundLabel.style('padding', '5px');
+  // backgroundFileInput.position(backgroundLabel.x + 140, backgroundLabel.y+20)
+  // backgroundFileInput.attribute('disabled', '');
+
+  // let checkboxLabel = createP('Enable Blur');
+  // checkboxLabel.position(15, backgroundLabel.y + 40);
+  // checkboxLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
+  // checkboxLabel.style('padding', '5px');
+  // checkbox = createCheckbox('', false); 
+  // checkbox.position(checkboxLabel.x + 90, checkboxLabel.y+20);
+  // checkbox.changed(checked);
+  // checkbox.attribute('disabled', '');  
 
   noLoop();
 
@@ -240,17 +354,6 @@ function draw() {
       endShape()
     }
     manageParticles('Circle');
-    // var p = new Particle()
-    // particles.push(p)
-    // for (var i = particles.length - 1; i >= 0; i--) {
-    //   if (!particles[i].edges()) {
-    //     particles[i].update(amp > 230)
-    //     particles[i].show()
-    //   } else {
-    //     particles.splice(i, 1)
-    //   }
-      
-    // }
   } else if (shapeSelect.selected() == 'Diamond') {
       for (var t = -4; t <= 4; t += 1) {
         beginShape()
@@ -264,10 +367,12 @@ function draw() {
             vertex(x, y)
           }
         endShape()
-
-        manageParticles('Diamond');
-      }
-  } else { // this is line
+        }
+      if(minPartSlider.value() != 0 || maxPartSlider.value() != 0) {
+          manageParticles('Diamond')
+        }
+      
+  } else { 
     beginShape()
     for (var i = 0; i < width*1; i++) {
       var index = floor(map(i, 0, width*1, 0, wave.length))
@@ -336,6 +441,7 @@ class Particle {
     this.vel = createVector(0, 0);
     this.acc = this.pos.copy().mult(random(0.0001, 0.00001));
     this.w = random(minPartSlider.value(), maxPartSlider.value())
+    // this.w = random(3, 5);
     this.color = particleColor.color(); // Ensure you have a default if particleColor is undefined
   }
   update(cond) {
@@ -363,44 +469,19 @@ function manageParticles(shape) {
   particles.push(p);
 
   for (var i = particles.length - 1; i >= 0; i--) {
+
     if (!particles[i].edges()) {
+
       particles[i].update(amp > 230); // Consider updating this condition or making it shape-dependent
+
       particles[i].show();
+
     } else {
+
       particles.splice(i, 1);
+
     }
+
   }
+
 }
-// class Particle {
-//   constructor() {
-//     this.pos = p5.Vector.random2D().mult(250)
-//     this.vel = createVector(0, 0)
-//     this.acc = this.pos.copy().mult(random(0.0001, 0.00001))
-
-//     this.w = random(minPartSlider.value(), maxPartSlider.value())
-
-//     // this.color = [random(20, 255), random(200, 255), random(200, 255),]
-//     this.color = particleColor.color();
-//   }
-//   update(cond) {
-//     this.vel.add(this.acc)
-//     this.pos.add(this.vel)
-//     if (cond) {
-//       this.pos.add(this.vel)
-//       this.pos.add(this.vel)
-//       this.pos.add(this.vel)
-//     }
-//   }
-//   edges() {
-//     if (this.pos.x < -width / 2 || this.pos.x > width / 2 || this.pos.y < -height / 2 || this.pos.y > height / 2) {
-//       return true
-//     } else {
-//       return false
-//     }
-//   }
-//   show() {
-//     noStroke()
-//     fill(this.color)
-//     ellipse(this.pos.x, this.pos.y, this.w)
-//   }
-// }
