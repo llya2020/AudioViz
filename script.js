@@ -13,19 +13,6 @@ function preload() {
   img = loadImage('gradient.jpg');
   imgLoaded = true;
 }
-function record(){
-  if (!isRecording){
-    recorder.start();
-    btn.html('stop recording');
-    isRecording = true;
-  }
-  else if (isRecording){
-    recorder.stop();
-    btn.html('start recording');
-    isRecording = false;
-  }
-  
-}
 
 function record(){
   play();
@@ -47,9 +34,6 @@ function setup() {
   fileInput = createFileInput(handleAudioFile);
   fileInput.position(5, 5);
   backgroundFileInput = createFileInput(handleImgFile);
-  recorder = new Recorder(this);
-  btn = createButton('start recording');
-  btn.mousePressed(record);
   createCanvas(windowWidth, windowHeight);
 
   angleMode(DEGREES);
@@ -281,7 +265,7 @@ function draw() {
           }
         endShape()
 
-        // manageParticles('Diamond');
+        manageParticles('Diamond');
       }
   } else { // this is line
     beginShape()
@@ -379,21 +363,13 @@ function manageParticles(shape) {
   particles.push(p);
 
   for (var i = particles.length - 1; i >= 0; i--) {
-
     if (!particles[i].edges()) {
-
       particles[i].update(amp > 230); // Consider updating this condition or making it shape-dependent
-
       particles[i].show();
-
     } else {
-
       particles.splice(i, 1);
-
     }
-
   }
-
 }
 // class Particle {
 //   constructor() {
