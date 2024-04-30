@@ -6,6 +6,8 @@ var particles = []
 
 let isPlaying = false;
 let slider; // Slider to scrub through the song
+let minPartSlider;
+let maxPartSlider;
 let recorder; //from recorder.js, mediaARecorder wrapper
 let isRecording = false;
 
@@ -94,6 +96,7 @@ function setup() {
   minPartSliderLab.position(15, minPartSlider.y + 5);
   minPartSliderLab.style('background-color', 'rgba(255, 255, 255, 0.7)');
   minPartSliderLab.style('padding', '5px');
+  minPartSlider.input(cmin);
 
   maxPartSlider = createSlider(0,40,3);
   maxPartSlider.position(10, minPartSliderLab.y+50);
@@ -104,6 +107,7 @@ function setup() {
   maxPartSliderLab.position(15, maxPartSlider.y + 5);
   maxPartSliderLab.style('background-color', 'rgba(255, 255, 255, 0.7)');
   maxPartSliderLab.style('padding', '5px');
+  maxPartSlider.input(cmax);
 
   let particleColorLabel = createP('Particle Color:');
   particleColorLabel.position(15, maxPartSliderLab.y + maxPartSliderLab.height + 25);
@@ -143,6 +147,18 @@ function setup() {
   checkbox.position(checkboxLabel.x + 90, checkboxLabel.y+20);
   checkbox.changed(checked);
   checkbox.attribute('disabled', '');  
+  }
+
+  function cmin() {
+    if (minPartSlider.value() >= maxPartSlider.value()) {
+      minPartSlider.value(maxPartSlider.value());
+    }
+  }
+  
+  function cmax() {
+    if (maxPartSlider.value() <= minPartSlider.value()) {
+      maxPartSlider.value(minPartSlider.value() + 1);
+    }
   }
 
   // // alert("Please upload an audio file using the Choose File button in the top left corner")
