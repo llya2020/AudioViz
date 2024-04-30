@@ -8,8 +8,14 @@ let isPlaying = false;
 let slider; // Slider to scrub through the song
 let recorder; //from recorder.js, mediaARecorder wrapper
 let isRecording = false;
+var playimg;
+var pauseimg;
+let dpi = window.devicePixelRatio;
+let playPauseButton;
 
 function preload() {
+  playimg = loadImage('pausebtn.png');
+  pauseimg = loadImage('pausebtn.png');  
   img = loadImage('gradient.jpg');
   imgLoaded = true;
 }
@@ -40,26 +46,38 @@ function showModal() {
   modalDiv.style('text-align', 'center');
   modalDiv.style('width', '100vw'); // Set width to 100% of viewport width
   modalDiv.style('height', '100vh');
+  modalDiv.style('color', '#fafafa'); 
+  modalDiv.style('font-family', 'lato'); // Change font
   
-  // Add elements to modal
   let title = createElement('h1', 'Welcome to AudioViz');
   title.parent(modalDiv);
+  title.style('margin', '100px 0px 50px 0px'); 
   
-  let instructions = createElement('p', 'Please upload an audio file below to continue!');
+  let instructions = createElement('p', 'Please upload an audio file below to continue');
   instructions.parent(modalDiv);
   
   let fileInput = createFileInput(handleAudioFile);
-  fileInput.parent(modalDiv);
+  let customFileButton = createButton('Upload Audio'); // Create a custom button
+  customFileButton.parent(modalDiv);
+  customFileButton.style('background-color', '#fcc860'); // Set button background color
+  customFileButton.style('color', 'white'); //
+  customFileButton.style('padding', '10px 20px'); 
+  customFileButton.style('border', 'none'); 
+  customFileButton.style('border-radius', '5px'); 
+  customFileButton.style('cursor', 'pointer'); 
+  customFileButton.style('margin', '5px 0'); 
+  fileInput.style('display', 'none'); // Hide default file input
+  customFileButton.mousePressed(() => fileInput.elt.click()); // Trigger file input click event when custom button is clicked
 }
 
 function setup() {
+  textFont('Lato');
   createCanvas(windowWidth, windowHeight);
-
-  if (song == null) {
-    showModal();
-  } else {
+  // if (song == null) {
+    // showModal();
+  // } else {
     startVisualizer();
-  }
+  // }
 }
 
 function startVisualizer() {
@@ -81,19 +99,41 @@ function startVisualizer() {
 
   //implements video scrubbing slider
   slider = createSlider(0, 1, 0, 0.001);
-  slider.position(10, fileInput.y + 40);
+  slider.position((windowWidth - slider.width) / 10, windowHeight - 70);
   slider.style('width', '80%');
   //function to allow the video to jump to the point in time of the slider
   slider.input(() => {
     let songCurrentTime = map(slider.value(), 0, 1, 0, song.duration());
-    song.jump(songCurrentTime);
+    song.jump(songCurrentTime); 
   });
   slider.attribute('disabled', '');
-  //slider.changed(play);
-  let sliderLabel = createP('Playback Control');
-  sliderLabel.position(15, slider.y + 5);
-  sliderLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
-  sliderLabel.style('padding', '5px');
+  slider.changed(play);
+  // let playPauseButton = createImg('/playbtn.png','play');
+  playPauseButton = createButton('')
+  playPauseButton.style('background-image', 'url("/pausebtn.png")'); // Set play image as background
+  playPauseButton.style('background-size', 'cover'); // Ensure image covers button
+  playPauseButton.size(25*dpi,25*dpi);
+  playPauseButton.position(slider.x - 55, slider.y - slider.height /2 -5); // Adjust the position as needed
+  playPauseButton.style('border', 'none'); // Remove border
+  playPauseButton.style('background-color', 'transparent'); // Remove background color
+  
+    // Change image and toggle play/pause state when button is clicked
+    playPauseButton.mousePressed(() => {
+      if (isPlaying) {
+        playPauseButton.style('background-image', 'url("/playbtn.png")'); // Set pause image when playing
+        playPauseButton.size(30*dpi,30*dpi);
+        playPauseButton.position(slider.x - 60, slider.y - slider.height /2 - 9); // Adjust the position as needed
+      } else {
+        playPauseButton.style('background-image', 'url("/pausebtn.png")'); // Set pause image when playing
+        playPauseButton.size(25*dpi,25*dpi);
+
+        playPauseButton.position(slider.x - 55, slider.y - slider.height /2 -5); // Adjust the position as needed
+
+      }
+      togglePlayPause();
+      // Add logic to play or pause the song here
+    });
+
 
   strokeSlider = createSlider(1,25,1);
   strokeSlider.position(10, slider.y+slider.height+55);
@@ -179,7 +219,6 @@ function startVisualizer() {
 function handleAudioFile(file) {
   if (file.type === 'audio') {
     song = loadSound(file.data, () => {
-      // setup();
       sload = true;
       backgroundFileInput.removeAttribute('disabled');
       slider.removeAttribute('disabled');
@@ -330,24 +369,40 @@ function play() {
   }
 }
 
+function togglePlayPause() {
+      if (isPlaying) {
+        isPlaying = false;
+        song.pause();
+        noLoop(); // Remove this to keep the draw loop running
+      } else {
+        isPlaying = true;
+        song.play();
+        //if we moved the slider from when it was paused, jump there
+        if (abs(slider.value() - map(song.currentTime(), 0, song.duration(), 0, 1)) > 0.01) {
+          song.jump(map(slider.value(), 0, 1, 0, song.duration()));
+        }
+        loop();
+      }
+}
+
 function mouseClicked() {
   // Check if the mouse is not over the slider
 
-  if (!slider.elt.matches(':hover')&&!checkbox.elt.matches(':hover')&&!strokeColor.elt.matches(':hover')&&!strokeSlider.elt.matches(':hover')&&!particleColor.elt.matches(':hover')&&!minPartSlider.elt.matches(':hover')&&!maxPartSlider.elt.matches(':hover')&&!shapeSelect.elt.matches(':hover')&&(mouseY<=windowHeight)) {
-    if (isPlaying) {
-      isPlaying = false;
-      song.pause();
-      noLoop(); // Remove this to keep the draw loop running
-    } else {
-      isPlaying = true;
-      song.play();
-      //if we moved the slider from when it was paused, jump there
-      if (abs(slider.value() - map(song.currentTime(), 0, song.duration(), 0, 1)) > 0.01) {
-        song.jump(map(slider.value(), 0, 1, 0, song.duration()));
-      }
-      loop();
-    }
-  }
+  // if (!slider.elt.matches(':hover')&&!checkbox.elt.matches(':hover')&&!strokeColor.elt.matches(':hover')&&!strokeSlider.elt.matches(':hover')&&!particleColor.elt.matches(':hover')&&!minPartSlider.elt.matches(':hover')&&!maxPartSlider.elt.matches(':hover')&&!shapeSelect.elt.matches(':hover')&&(mouseY<=windowHeight)) {
+  //   if (isPlaying) {
+  //     isPlaying = false;
+  //     song.pause();
+  //     noLoop(); // Remove this to keep the draw loop running
+  //   } else {
+  //     isPlaying = true;
+  //     song.play();
+  //     //if we moved the slider from when it was paused, jump there
+  //     if (abs(slider.value() - map(song.currentTime(), 0, song.duration(), 0, 1)) > 0.01) {
+  //       song.jump(map(slider.value(), 0, 1, 0, song.duration()));
+  //     }
+  //     loop();
+  //   }
+  // }
 }
 class Particle {
   constructor(shape) {
