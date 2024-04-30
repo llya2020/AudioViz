@@ -28,17 +28,46 @@ function record(){
   }
 }
 
+function showModal() {
+  // Create modal popup
+  let modalDiv = createDiv('');
+  modalDiv.id('modal');
+  modalDiv.style('position', 'absolute');
+  modalDiv.style('top', '50%');
+  modalDiv.style('left', '50%');
+  modalDiv.style('transform', 'translate(-50%, -50%)');
+  modalDiv.style('background-color', '#F6A7C1');
+  modalDiv.style('text-align', 'center');
+  modalDiv.style('width', '100vw'); // Set width to 100% of viewport width
+  modalDiv.style('height', '100vh');
+  
+  // Add elements to modal
+  let title = createElement('h1', 'Welcome to AudioViz');
+  title.parent(modalDiv);
+  
+  let instructions = createElement('p', 'Please upload an audio file below to continue!');
+  instructions.parent(modalDiv);
+  
+  let fileInput = createFileInput(handleAudioFile);
+  fileInput.parent(modalDiv);
+}
+
 function setup() {
-  if (song != null) {
-    createCanvas(400,400)
-    background(100)
+  createCanvas(windowWidth, windowHeight);
+
+  if (song == null) {
+    showModal();
   } else {
-    // alert("Please upload an audio file using the Choose File button in the top left corner")
+    startVisualizer();
+  }
+}
+
+function startVisualizer() {
+  // alert("Please upload an audio file using the Choose File button in the top left corner")
   idata = img.canvas.toDataURL();
   fileInput = createFileInput(handleAudioFile);
   fileInput.position(5, 5);
   backgroundFileInput = createFileInput(handleImgFile);
-  createCanvas(windowWidth, windowHeight);
 
   angleMode(DEGREES);
   imageMode(CENTER);
@@ -142,127 +171,15 @@ function setup() {
   checkbox = createCheckbox('', false); 
   checkbox.position(checkboxLabel.x + 90, checkboxLabel.y+20);
   checkbox.changed(checked);
-  checkbox.attribute('disabled', '');  
-  }
+  checkbox.attribute('disabled', ''); 
 
-  // // alert("Please upload an audio file using the Choose File button in the top left corner")
-  // idata = img.canvas.toDataURL();
-  // fileInput = createFileInput(handleAudioFile);
-  // fileInput.position(5, 5);
-  // backgroundFileInput = createFileInput(handleImgFile);
-  // createCanvas(windowWidth, windowHeight);
-
-  // angleMode(DEGREES);
-  // imageMode(CENTER);
-  // rectMode(CENTER);
-  // fft = new p5.FFT(0.3);
-
-  // recorder = new Recorder(this);
-  // btn = createButton('Start Recording');
-  // btn.mousePressed(record);
-  // btn.attribute('disabled', ''); 
-
-  // //implements video scrubbing slider
-  // slider = createSlider(0, 1, 0, 0.001);
-  // slider.position(10, fileInput.y + 40);
-  // slider.style('width', '80%');
-  // //function to allow the video to jump to the point in time of the slider
-  // slider.input(() => {
-  //   let songCurrentTime = map(slider.value(), 0, 1, 0, song.duration());
-  //   song.jump(songCurrentTime);
-  // });
-  // slider.attribute('disabled', '');
-  // //slider.changed(play);
-  // let sliderLabel = createP('Playback Control');
-  // sliderLabel.position(15, slider.y + 5);
-  // sliderLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
-  // sliderLabel.style('padding', '5px');
-
-  // strokeSlider = createSlider(1,25,1);
-  // strokeSlider.position(10, slider.y+slider.height+55);
-  // strokeSlider.style('width', '20%');
-  // strokeSlider.attribute('disabled', '');  
-  // strokeSlider.changed(play);
-  // let strokeLabel = createP('Stroke Weight:');
-  // strokeLabel.position(15, strokeSlider.y + strokeSlider.height - 10);
-  // strokeLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
-  // strokeLabel.style('padding', '5px');
-  
-  // let strokeColorLabel = createP('Stroke Color');
-  // strokeColorLabel.position(15, strokeSlider.y + strokeSlider.height + 30);
-  // strokeColorLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
-  // strokeColorLabel.style('padding', '5px');
-  // strokeColor = createColorPicker('deeppink');
-  // strokeColor.position(strokeColorLabel.x + 100, strokeColorLabel.y + 16);
-  // strokeColor.attribute('disabled', '');  
-  // strokeColor.changed(play);
-
-  // minPartSlider = createSlider(0,40,6);
-  // minPartSlider.position(10, strokeColorLabel.y + 55);
-  // minPartSlider.style('width', '20%');
-  // minPartSlider.attribute('disabled', '');  
-  // minPartSlider.changed(play);
-  // let minPartSliderLab = createP('Min Particle Size:');
-  // minPartSliderLab.position(15, minPartSlider.y + 5);
-  // minPartSliderLab.style('background-color', 'rgba(255, 255, 255, 0.7)');
-  // minPartSliderLab.style('padding', '5px');
-
-  // maxPartSlider = createSlider(0,40,3);
-  // maxPartSlider.position(10, minPartSliderLab.y+50);
-  // maxPartSlider.style('width', '20%');
-  // maxPartSlider.attribute('disabled', '');  
-  // maxPartSlider.changed(play);
-  // let maxPartSliderLab = createP('Max Particle Size:');
-  // maxPartSliderLab.position(15, maxPartSlider.y + 5);
-  // maxPartSliderLab.style('background-color', 'rgba(255, 255, 255, 0.7)');
-  // maxPartSliderLab.style('padding', '5px');
-
-  // let particleColorLabel = createP('Particle Color:');
-  // particleColorLabel.position(15, maxPartSliderLab.y + maxPartSliderLab.height + 25);
-  // particleColorLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
-  // particleColorLabel.style('padding', '5px');
-  // particleColor = createColorPicker('lightgreen');
-  // particleColor.position(particleColorLabel.x + 110, particleColorLabel.y + 16);
-  // particleColor.attribute('disabled', '');  
-  // particleColor.changed(play)
-
-  // let shapeSelectLabel = createP('Shape Select');
-  // shapeSelectLabel.position(15, particleColor.y + 20);
-  // shapeSelectLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
-  // shapeSelectLabel.style('padding', '5px');
-  // shapeSelect = createSelect();
-  // shapeSelect.position(100 + shapeSelectLabel.x,shapeSelectLabel.y+20);
-  // shapeSelect.attribute('disabled', '');  
-  // shapeSelect.changed(play);
-  // // Add color options.
-  // shapeSelect.option('Circle');
-  // shapeSelect.option('Line');
-  // shapeSelect.option('Diamond');
-  // shapeSelect.selected('Circle');
-
-  // let backgroundLabel = createP('Background Image');
-  // backgroundLabel.position(15, shapeSelectLabel.y + 40);
-  // backgroundLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
-  // backgroundLabel.style('padding', '5px');
-  // backgroundFileInput.position(backgroundLabel.x + 140, backgroundLabel.y+20)
-  // backgroundFileInput.attribute('disabled', '');
-
-  // let checkboxLabel = createP('Enable Blur');
-  // checkboxLabel.position(15, backgroundLabel.y + 40);
-  // checkboxLabel.style('background-color', 'rgba(255, 255, 255, 0.7)');
-  // checkboxLabel.style('padding', '5px');
-  // checkbox = createCheckbox('', false); 
-  // checkbox.position(checkboxLabel.x + 90, checkboxLabel.y+20);
-  // checkbox.changed(checked);
-  // checkbox.attribute('disabled', '');  
-
-  noLoop();
-
+  noLoop(); 
 }
 
 function handleAudioFile(file) {
   if (file.type === 'audio') {
     song = loadSound(file.data, () => {
+      // setup();
       sload = true;
       backgroundFileInput.removeAttribute('disabled');
       slider.removeAttribute('disabled');
@@ -279,6 +196,8 @@ function handleAudioFile(file) {
       song.play();
       loop();
     });
+    select('#modal').remove();
+    startVisualizer();
   } else {
     print('Invalid audio file!');
   }
